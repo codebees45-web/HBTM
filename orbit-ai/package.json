@@ -1,0 +1,27 @@
+{
+  "name": "orbit-ai",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "npm run dev --prefix server",
+    "dev:all": "concurrently -n web,api -c blue,yellow \"npm run dev\" \"npm run dev:server\"",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7",
+    "qrcode": "^1.5.4",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow-models/coco-ssd": "^2.2.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "vite": "^5.4.1"
+  }
+}
