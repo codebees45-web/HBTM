@@ -1,0 +1,9 @@
+node_modules
+dist
+.DS_Store
+
+# Secrets — never commit these (see .env.example / server/.env.example instead)
+.env
+.env.local
+server/.env
+server/.env.local

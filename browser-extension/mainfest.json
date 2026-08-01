@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Aether",
+  "version": "1.0.0",
+  "description": "Tracks real reading-vs-scrolling activity on course provider sites (Coursera, Udemy, Cisco NetAcad) and feeds it back into your AETHER dashboard. A webpage can't observe another origin's scroll/focus events on its own — that's exactly what this extension exists to do.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://*.coursera.org/*",
+    "https://*.udemy.com/*",
+    "https://*.netacad.com/*",
+    "http://localhost:5173/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.coursera.org/*",
+        "https://*.udemy.com/*",
+        "https://*.netacad.com/*"
+      ],
+      "js": ["content-tracker.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://localhost:5173/*"],
+      "js": ["content-bridge.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
+
