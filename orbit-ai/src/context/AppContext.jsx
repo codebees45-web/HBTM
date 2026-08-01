@@ -45,6 +45,7 @@ const DEFAULT_STATE = {
   activityLog: [], // ['YYYY-MM-DD', ...] — one entry per day with study activity
   journalEntries: [], // [{ id, date, content }]
   resources: [], // [{ id, title, url, type, notes }]
+  mood: null,
   profile: {
     name: 'Learner',
     email: '',
@@ -459,6 +460,10 @@ export function AppProvider({ children }) {
     setState((s) => ({ ...s, resources: (s.resources || []).filter(r => r.id !== id) }))
   }
 
+  function setMood(mood) {
+    setState((s) => ({ ...s, mood }))
+  }
+
   function resetProgress() {
     setState((s) => ({
       ...DEFAULT_STATE,
@@ -502,6 +507,7 @@ export function AppProvider({ children }) {
     deleteJournalEntry,
     addResource,
     deleteResource,
+    setMood,
     dayStreak: computeDayStreak(state.activityLog, state.freezeLog),
     t,
   }

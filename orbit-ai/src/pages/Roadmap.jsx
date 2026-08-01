@@ -248,6 +248,8 @@ export default function Roadmap() {
     ? Math.round(scored.reduce((sum, m) => sum + m.quizScore, 0) / scored.length)
     : null
 
+  const fillPercentage = roadmap.length > 1 ? (completedCount / (roadmap.length - 1)) * 100 : 0;
+
   function startSession(m) {
     setSessionMilestone(m)
     setReadyForAssessment(null)
@@ -318,6 +320,39 @@ export default function Roadmap() {
       </div>
 
       <div className="panel progress-overview" style={{ marginBottom: 20 }}>
+        {/* Timeline Component */}
+        <div style={{ marginBottom: '36px', position: 'relative', overflow: 'hidden', padding: '0 4px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+            {roadmap.map((m, i) => {
+              const isCompleted = m.status === 'completed';
+              const isActive = m.status === 'active';
+              return (
+                <div key={m.milestoneId} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '32px', cursor: 'default' }} title={m.title}>
+                  <div 
+                    style={{
+                      width: '16px', height: '16px', borderRadius: '50%',
+                      background: isCompleted ? 'var(--gold)' : isActive ? 'var(--bg-panel)' : 'var(--bg-panel-2)',
+                      border: `2px solid ${isCompleted || isActive ? 'var(--gold)' : 'var(--line)'}`,
+                      zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    {isActive && <div className="timeline-pulse"></div>}
+                  </div>
+                  <span style={{ fontSize: '10px', marginTop: '8px', color: isCompleted || isActive ? 'var(--text)' : 'var(--muted)', fontWeight: isActive ? 600 : 400 }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ position: 'absolute', top: '7px', left: '19px', right: '19px', height: '2px', background: 'var(--line)', zIndex: 0 }}>
+            <div 
+              className="timeline-fill"
+              style={{ height: '100%', background: 'var(--gold)', '--fill-target': `${fillPercentage}%` }} 
+            />
+          </div>
+        </div>
+
         <div className="progress-stats">
           <div className="progress-stat">
             <span className="progress-stat-value">{completedCount}<span className="progress-stat-of"> / {roadmap.length}</span></span>

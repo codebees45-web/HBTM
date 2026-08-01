@@ -3,12 +3,12 @@ import { useApp } from '../context/AppContext.jsx'
 import TopBar from '../components/TopBar.jsx'
 
 const NAV_ITEMS = [
-  { to: '/dashboard', label: 'Performance', end: true, icon: '◎' },
-  { to: '/dashboard/roadmap', label: 'Curated Path', icon: '⟿' },
-  { to: '/dashboard/growth-plan', label: 'Growth Plan', icon: '◐' },
-  { to: '/dashboard/vault', label: 'Knowledge Vault', icon: '✦' },
-  { to: '/dashboard/journal', label: 'Daily Journal', icon: '📝' },
-  { to: '/dashboard/assessment', label: 'Reflection', icon: '▣' },
+  { to: '/dashboard', label: 'Performance', end: true, icon: '⌘' },
+  { to: '/dashboard/roadmap', label: 'Curated Path', icon: '⎈' },
+  { to: '/dashboard/growth-plan', label: 'Growth Plan', icon: '◩' },
+  { to: '/dashboard/vault', label: 'Knowledge Vault', icon: '⛶' },
+  { to: '/dashboard/journal', label: 'Daily Journal', icon: '◰' },
+  { to: '/dashboard/assessment', label: 'Reflection', icon: '◱' },
   { to: '/dashboard/mentor', label: 'AETHER Oracle', icon: '✧' },
   { to: '/dashboard/notifications', label: 'Notifications', icon: '◈' },
   { to: '/dashboard/analytics', label: 'Analytics', icon: '▤' },

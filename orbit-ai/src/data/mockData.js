@@ -7,7 +7,12 @@
 const XP_PER_LEVEL = 100
 
 export function levelFromXp(xp) {
-  return Math.floor((xp || 0) / XP_PER_LEVEL) + 1
+  const safeXp = Number(xp) || 0;
+  return {
+    level: Math.floor(safeXp / XP_PER_LEVEL) + 1,
+    currentTierXp: safeXp % XP_PER_LEVEL,
+    nextTierXp: XP_PER_LEVEL
+  }
 }
 
 export function xpIntoLevel(xp) {

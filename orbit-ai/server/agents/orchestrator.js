@@ -21,6 +21,7 @@ import { runHabitAgent } from './habitAgent.js'
 import { runGapAnalysisAgent } from './gapAnalysisAgent.js'
 import { runCuratorAgent } from './curatorAgent.js'
 import { runGrowthCoachAgent } from './growthCoachAgent.js'
+import { runSentimentAgent } from './sentimentAgent.js'
 
 const lastWins = (_prev, next) => next
 
@@ -32,8 +33,10 @@ const AETHERState = Annotation.Root({
   roadmap: Annotation({ value: lastWins, default: () => [] }),
   existingIdentityProfile: Annotation({ value: lastWins, default: () => null }),
   feedbackHistory: Annotation({ value: lastWins, default: () => [] }),
+  journalEntries: Annotation({ value: lastWins, default: () => [] }),
 
   // ---- produced by each node, in pipeline order ----
+  sentimentProfile: Annotation({ value: lastWins, default: () => null }),
   identityProfile: Annotation({ value: lastWins, default: () => null }),
   habitProfile: Annotation({ value: lastWins, default: () => null }),
   gaps: Annotation({ value: lastWins, default: () => [] }),
@@ -43,11 +46,22 @@ const AETHERState = Annotation.Root({
   growthPlan: Annotation({ value: lastWins, default: () => null }),
 })
 
+async function sentimentNode(state) {
+  const sentimentProfile = await runSentimentAgent({
+    journalEntries: state.journalEntries,
+    activityLog: state.activityLog,
+    roadmap: state.roadmap,
+    timeSpentLog: state.timeSpentLog
+  })
+  return { sentimentProfile }
+}
+
 async function identityNode(state) {
   const identityProfile = await runIdentityAgent({
     goal: state.goal,
     existingProfile: state.existingIdentityProfile,
     feedbackHistory: state.feedbackHistory,
+    sentimentProfile: state.sentimentProfile,
   })
   return { identityProfile }
 }
@@ -57,6 +71,7 @@ async function habitNode(state) {
     activityLog: state.activityLog,
     timeSpentLog: state.timeSpentLog,
     roadmap: state.roadmap,
+    sentimentProfile: state.sentimentProfile,
   })
   return { habitProfile }
 }
@@ -87,12 +102,14 @@ async function growthCoachNode(state) {
 }
 
 const graph = new StateGraph(AETHERState)
+  .addNode('sentiment', sentimentNode)
   .addNode('identity', identityNode)
   .addNode('habit', habitNode)
   .addNode('gapAnalysis', gapAnalysisNode)
   .addNode('curator', curatorNode)
   .addNode('growthCoach', growthCoachNode)
-  .addEdge(START, 'identity')
+  .addEdge(START, 'sentiment')
+  .addEdge('sentiment', 'identity')
   .addEdge('identity', 'habit')
   .addEdge('habit', 'gapAnalysis')
   .addEdge('gapAnalysis', 'curator')

@@ -18,14 +18,14 @@ const router = Router()
 // fall back to their last-synced state so nothing breaks for existing callers.
 router.post('/cycle', identify, async (req, res) => {
   try {
-    let goal, roadmap = [], activityLog = [], timeSpentLog = []
+    let goal, roadmap = [], activityLog = [], timeSpentLog = [], journalEntries = []
 
     if (req.body && req.body.goal) {
-      ;({ goal, roadmap = [], activityLog = [], timeSpentLog = [] } = req.body)
+      ;({ goal, roadmap = [], activityLog = [], timeSpentLog = [], journalEntries = [] } = req.body)
     } else if (!req.isGuest) {
       const user = await User.findById(req.userId)
       if (!user) return res.status(404).json({ error: 'User not found' })
-      ;({ goal, roadmap = [], activityLog = [], timeSpentLog = [] } = user.state || {})
+      ;({ goal, roadmap = [], activityLog = [], timeSpentLog = [], journalEntries = [] } = user.state || {})
     }
 
     if (!goal || !goal.text) {
@@ -39,6 +39,7 @@ router.post('/cycle', identify, async (req, res) => {
       roadmap,
       activityLog,
       timeSpentLog,
+      journalEntries,
       existingIdentityProfile: existingIdentity?.current || null,
       feedbackHistory: existingIdentity?.feedbackHistory || [],
     })

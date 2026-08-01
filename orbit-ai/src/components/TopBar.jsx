@@ -10,10 +10,12 @@ export default function TopBar() {
     <header className="top-bar">
       <div className="top-bar-spacer" />
       <div className="top-bar-actions">
-        <NavLink to="/dashboard/streak" className="streak-pill" title="Current streak">
-          <span className="streak-flame" aria-hidden="true">🔥</span>
-          <span>{state.streak}</span>
-        </NavLink>
+        {state.mood && (
+          <div className="streak-pill" title="Current mood" style={{cursor: 'default', pointerEvents: 'none'}}>
+            <span aria-hidden="true">{state.mood === 'Optimal' ? '⚡' : state.mood === 'Standard' ? '🔋' : '🪫'}</span>
+            <span>{state.mood}</span>
+          </div>
+        )}
 
         <NavLink to="/dashboard/notifications" className="icon-btn" aria-label="Notifications">
           <span aria-hidden="true">◈</span>

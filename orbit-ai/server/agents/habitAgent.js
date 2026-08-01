@@ -63,15 +63,16 @@ function computeStats({ activityLog = [], timeSpentLog = [], roadmap = [] }) {
  * @param {object} params
  * @param {string[]} params.activityLog - ['YYYY-MM-DD', ...]
  * @param {Array<{day:string, plannedMin:number, actualMin:number}>} params.timeSpentLog
- * @param {Array} params.roadmap
+ * @param {Array<object>} params.roadmap - all milestones, so the agent can see completion vs active
+ * @param {object|null} params.sentimentProfile - current emotional state from Sentiment Agent
  * @returns {Promise<object>} Habit Profile
  */
-export async function runHabitAgent({ activityLog = [], timeSpentLog = [], roadmap = [] }) {
+export async function runHabitAgent({ activityLog = [], timeSpentLog = [], roadmap = [], sentimentProfile = null }) {
   const stats = computeStats({ activityLog, timeSpentLog, roadmap })
 
   const narrative = await callGroqJson({
     system: SYSTEM_PROMPT,
-    user: `Computed statistics:\n${JSON.stringify(stats, null, 2)}`,
+    user: `Computed statistics:\n${JSON.stringify(stats, null, 2)}\nSentiment profile: ${JSON.stringify(sentimentProfile)}`,
     max_tokens: 400,
   })
 

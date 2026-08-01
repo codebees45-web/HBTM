@@ -31,9 +31,10 @@ Respond with ONLY valid JSON, no markdown fences, no preamble, matching exactly 
  * @param {object|null} params.existingProfile - the last stored Identity Profile, if any
  * @param {Array<{note:string, at:string}>} params.feedbackHistory - reflections/progress
  *        fed back from previous Growth Coach cycles (see routes/AETHER.js POST /feedback)
+ * @param {object|null} params.sentimentProfile - current emotional state from Sentiment Agent
  * @returns {Promise<object>} Identity Profile
  */
-export async function runIdentityAgent({ goal, existingProfile = null, feedbackHistory = [] }) {
+export async function runIdentityAgent({ goal, existingProfile = null, feedbackHistory = [], sentimentProfile = null }) {
   const userParts = [
     `Stated goal: "${goal?.text || 'unknown'}"`,
     `Domain: ${goal?.domain || 'unspecified'}`,
@@ -54,6 +55,15 @@ export async function runIdentityAgent({ goal, existingProfile = null, feedbackH
       'Recent feedback/reflections from the person, most recent last (use these to update strengths,',
       'weaknesses, and confidence — this is the feedback loop closing):',
       feedbackHistory.slice(-8).map((f) => `- (${f.at}) ${f.note}`).join('\n')
+    )
+  }
+
+  if (sentimentProfile) {
+    userParts.push(
+      '',
+      '--- Current Emotional State & Sentiment Analysis ---',
+      JSON.stringify(sentimentProfile, null, 2),
+      'Use this context to adjust strengths/weaknesses and understand their mental barriers today.'
     )
   }
 

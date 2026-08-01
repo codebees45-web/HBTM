@@ -32,7 +32,8 @@ export default function Header() {
           </div>
           
           <div className="l-nav-actions">
-            <Link to="/onboarding" className="l-pill l-pill-primary l-pill-sm">Initialize Protocol</Link>
+            <Link to="/login" className="l-pill l-pill-ghost l-pill-sm">Log In</Link>
+            <Link to="/register" className="l-pill l-pill-primary l-pill-sm">Sign Up</Link>
           </div>
         </div>
       </nav>
@@ -43,7 +44,10 @@ export default function Header() {
         <a className="l-nav-link" href="#paths" onClick={() => setMenuOpen(false)}>Neuro-Sync</a>
         <Link className="l-nav-link" to="/dashboard/mentor" onClick={() => setMenuOpen(false)}>The Oracle</Link>
         <Link className="l-nav-link" to="/dashboard/community" onClick={() => setMenuOpen(false)}>HiveMind</Link>
-        <Link to="/onboarding" className="l-pill l-pill-primary" style={{marginTop:'16px', width:'100%', justifyContent:'center'}} onClick={() => setMenuOpen(false)}>Initialize Protocol</Link>
+        <div style={{display:'flex', flexDirection:'column', gap:'10px', marginTop:'16px'}}>
+          <Link to="/login" className="l-pill l-pill-ghost" style={{width:'100%', justifyContent:'center'}} onClick={() => setMenuOpen(false)}>Log In</Link>
+          <Link to="/register" className="l-pill l-pill-primary" style={{width:'100%', justifyContent:'center'}} onClick={() => setMenuOpen(false)}>Sign Up</Link>
+        </div>
       </div>
       
       <div className="l-nav-spacer"></div>

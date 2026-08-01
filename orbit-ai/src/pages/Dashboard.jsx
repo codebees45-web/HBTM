@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext.jsx'
 import { levelFromXp } from '../data/mockData.js'
 
 export default function Dashboard() {
-  const { state } = useApp()
+  const { state, setMood } = useApp()
   const navigate = useNavigate()
   const { roadmap, xp, timeSpentLog, goal } = state
   const { level, currentTierXp, nextTierXp } = levelFromXp(xp)
@@ -41,6 +41,7 @@ export default function Dashboard() {
 
   function handleCalibrate(level) {
     setShowCalibration(false)
+    setMood(level)
     // In a real hackathon backend, this would trigger an AI recalculation of the roadmap.
     if (level === 'Depleted') {
       alert("AETHER has recalibrated your immediate tasks to 15-minute micro-sessions to preserve your streak and mental energy.")
@@ -82,52 +83,68 @@ export default function Dashboard() {
         </div>
       )}
       
-      <div className="bento-card bento-hero">
-        <div className="hero-content">
-          <span className="eyebrow">Your Identity</span>
-          <h1>{goal?.text || 'Becoming your future self.'}</h1>
-          <p className="hero-subtitle">You have completed {pct}% of your current curated path.</p>
+      <div className="bento-card bento-action" style={{ borderLeft: '4px solid #f59e0b' }}>
+        <div className="hero-action-badge">
+          <span className="pulse-dot-accent"></span>
+          Current Mission
         </div>
-        <div className="hero-stats">
-          <div className="level-ring-container">
-            <svg viewBox="0 0 100 100" className="level-ring">
-              <circle cx="50" cy="50" r="45" className="ring-bg" />
-              <circle cx="50" cy="50" r="45" className="ring-fill" strokeDasharray={`${progressToNext * 2.827} 282.7`} />
-            </svg>
-            <div className="level-number">Lvl {level}</div>
+        {upcoming.length === 0 ? (
+          <div className="empty-action">
+            <p>You've cleared your path.</p>
+            <button className="btn btn-primary" style={{marginTop: '16px'}} onClick={() => navigate('/dashboard/mentor')}>Talk to AETHER</button>
           </div>
-          <div className="xp-details">
-            <strong>{xp} Total XP</strong>
-            <span>{nextTierXp - currentTierXp} XP to next level</span>
+        ) : (
+          <div className="action-content" style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '24px'}}>
+            <div style={{maxWidth: '70%', minWidth: '300px'}}>
+              <h1 style={{fontSize: '36px', marginBottom: '12px', lineHeight: 1.1}}>{upcoming[0].title}</h1>
+              <p className="task-meta" style={{fontSize: '16px'}}>{upcoming[0].provider} · ~{upcoming[0].estHours}h estimated</p>
+            </div>
+            <button className="btn btn-primary btn-lg" onClick={() => navigate('/focus')}>
+              Begin Deep Dive →
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="bento-row">
+        <div className="bento-card bento-hero" style={{flex: 2}}>
+          <div className="hero-content">
+            <span className="eyebrow">Your Identity</span>
+            <h2 style={{fontSize: '24px', margin: '12px 0', fontFamily: 'Satoshi, sans-serif', fontWeight: 700}}>{goal?.text || 'Becoming your future self.'}</h2>
+            <p className="hero-subtitle">You have completed {pct}% of your current curated path.</p>
+          </div>
+          <div className="hero-stats">
+            <div className="level-ring-container">
+              <svg viewBox="0 0 100 100" className="level-ring">
+                <circle cx="50" cy="50" r="45" className="ring-bg" />
+                <circle cx="50" cy="50" r="45" className="ring-fill" strokeDasharray={`${Math.max((progressToNext || 0) * 2.827, 0)} 282.7`} />
+              </svg>
+              <div className="level-number">Lvl {level || 1}</div>
+            </div>
+            <div className="xp-details">
+              <strong>{xp || 0} Total XP</strong>
+              <span>{(nextTierXp || 100) - (currentTierXp || 0)} XP to next level</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bento-card bento-ledger terminal-card" style={{flex: 1}}>
+          <div className="panel-head" style={{marginBottom: '16px'}}>
+            <h2>System Log</h2>
+            <div className="pulse-dot" style={{width: 8, height: 8, borderRadius: '50%', background: '#10b981', opacity: 0.8}}></div>
+          </div>
+          <div className="ledger-feed" style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+            {ledgerEvents.map(ev => (
+              <div key={ev.id} className="ledger-event terminal-line">
+                {ev.text}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       <div className="bento-row">
-
-        <div className="bento-card bento-action">
-          <div className="panel-head">
-            <h2>Next Action</h2>
-          </div>
-          {upcoming.length === 0 ? (
-            <div className="empty-action">
-              <p>You've cleared your path.</p>
-              <button className="btn btn-primary" onClick={() => navigate('/dashboard/mentor')}>Talk to AETHER</button>
-            </div>
-          ) : (
-            <div className="action-content">
-              <h3>{upcoming[0].title}</h3>
-              <p className="task-meta">{upcoming[0].provider} · ~{upcoming[0].estHours}h</p>
-              <button className="btn btn-primary bento-btn" onClick={() => navigate('/focus')}>
-                Begin Deep Dive →
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="bento-row">
-        <div className="bento-card bento-velocity" style={{flex: 2}}>
+        <div className="bento-card bento-velocity" style={{flex: 1}}>
           <div className="panel-head">
             <h2>Velocity</h2>
             <Link className="muted-link" to="/dashboard/analytics">Full analytics →</Link>
@@ -153,20 +170,6 @@ export default function Dashboard() {
               </ResponsiveContainer>
             </div>
           )}
-        </div>
-
-        <div className="bento-card bento-ledger" style={{flex: 1, border: '1px solid var(--gold)'}}>
-          <div className="panel-head">
-            <h2 style={{color: 'var(--gold)'}}>HiveMind Ledger</h2>
-            <div className="pulse-dot" style={{width: 8, height: 8, borderRadius: '50%', background: 'var(--gold)', animation: 'pulse-ring 2s infinite'}}></div>
-          </div>
-          <div className="ledger-feed" style={{fontFamily: 'Fira Code, monospace', fontSize: '13px', color: 'var(--gold)', marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
-            {ledgerEvents.map(ev => (
-              <div key={ev.id} className="ledger-event typewriter-active" style={{borderRight: 'none', animation: 'none'}}>
-                {ev.text}
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 

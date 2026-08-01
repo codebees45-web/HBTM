@@ -2,12 +2,15 @@ import { useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx'
+import { Eye, EyeOff, AlertCircle } from 'lucide-react'
+import CursorTrail from '../components/CursorTrail.jsx'
 
 export default function Login() {
   const { login, loginWithGoogle } = useApp()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPwd, setShowPwd] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -17,9 +20,9 @@ export default function Login() {
     setBusy(true)
     try {
       await login(email.trim(), password)
-      navigate('/dashboard')
+      navigate('/onboarding')
     } catch (err) {
-      setError(err.message || 'Login failed')
+      setError(err.message || 'Login failed. Please check your credentials.')
     } finally {
       setBusy(false)
     }
@@ -30,7 +33,7 @@ export default function Login() {
       setError('')
       try {
         await loginWithGoogle(idToken)
-        navigate('/dashboard')
+        navigate('/onboarding')
       } catch (err) {
         setError(err.message || 'Google sign-in failed')
       }
@@ -39,53 +42,97 @@ export default function Login() {
   )
 
   return (
-    <div className="onboard-page">
-      <div className="onboard-card">
-        <span className="eyebrow">Welcome back</span>
-        <h1>Sign in to AETHER</h1>
-        <p className="onboard-sub">
-          Your roadmap, streak, and progress sync across devices once you're signed in.
-        </p>
-        <GoogleSignInButton text="signin_with" onCredential={handleGoogleCredential} />
-
-        <div className="auth-divider">
-          <span>or</span>
+    <div className="auth-split">
+      {/* Branded Panel */}
+      <div className="auth-brand">
+        <CursorTrail />
+        <div className="auth-brand-content">
+          <div className="auth-brand-logo">
+            <span className="auth-brand-dot" />
+            AETHER OS
+          </div>
         </div>
+      </div>
 
-        <form className="onboard-form" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="login-email">Email</label>
-            <input
-              id="login-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
+      {/* Form Panel */}
+      <div className="auth-form-panel">
+        <div className="auth-form-inner">
+          <span className="eyebrow">Welcome back</span>
+          <h1>Sign in to AETHER</h1>
+          <p className="auth-subtitle">
+            Your roadmap, progress, and cognitive profile sync across devices.
+          </p>
+
+          {error && (
+            <div className="auth-error-banner">
+              <AlertCircle size={18} />
+              {error}
+            </div>
+          )}
+
+          <GoogleSignInButton text="signin_with" onCredential={handleGoogleCredential} />
+
+          <div className="auth-divider">
+            <span>or sign in with email</span>
           </div>
-          <div>
-            <label htmlFor="login-password">Password</label>
-            <input
-              id="login-password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
+
+          <form onSubmit={handleSubmit}>
+            <div className="auth-field-group">
+              <label htmlFor="login-email">Email</label>
+              <input
+                id="login-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div className="auth-field-group">
+              <label htmlFor="login-password">Password</label>
+              <div className="auth-pwd-wrapper">
+                <input
+                  id="login-password"
+                  type={showPwd ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  className="auth-pwd-toggle"
+                  onClick={() => setShowPwd(!showPwd)}
+                  aria-label={showPwd ? 'Hide password' : 'Show password'}
+                >
+                  {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <button className="btn btn-primary auth-submit" type="submit" disabled={busy}>
+              {busy ? (
+                <>
+                  <span className="auth-spinner" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
+
+          <div className="auth-footer-links">
+            <p>
+              Don't have an account?{' '}
+              <Link to="/register">Create one</Link>
+            </p>
+            <Link to="/onboarding" className="auth-guest-link">
+              Continue as guest — local only →
+            </Link>
           </div>
-          {error && <p className="auth-error">{error}</p>}
-          <button className="btn btn-primary btn-lg" type="submit" disabled={busy}>
-            {busy ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
-        <p className="auth-switch">
-          New here? <Link to="/register">Create an account</Link>
-        </p>
-        <p className="auth-switch">
-          <Link to="/dashboard">Continue as guest instead →</Link>
-        </p>
+        </div>
       </div>
     </div>
   )
